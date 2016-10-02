@@ -145,3 +145,111 @@ Void chains_vipSingleCam_DisplayWbNull_SetAppPrms(chains_vipSingleCam_DisplayWbN
         );
 
 }
+
+/**
+ *******************************************************************************
+ *
+ * \brief   Start the capture display Links
+ *
+ *          Function sends a control command to capture and display link to
+ *          to Start all the required links . Links are started in reverce
+ *          order as information of next link is required to connect.
+ *          System_linkStart is called with LinkId to start the links.
+ *
+ * \param   pObj  [IN] chains_vipSingleCam_SgxDisplayAppObj
+ *
+ *
+ *******************************************************************************
+*/
+Void chains_vipSingleCam_DisplayWbNull_StartApp(chains_vipSingleCam_SgxDisplayAppObj *pObj)
+{
+    ChainsCommon_statCollectorReset();
+    ChainsCommon_memPrintHeapStatus();
+
+    chains_vipSingleCam_DisplayWbNull_Start(&pObj->ucObj);
+
+    ChainsCommon_prfLoadCalcEnable(TRUE, FALSE, FALSE);
+}
+
+/**
+ *******************************************************************************
+ *
+ * \brief   Stop the capture display Links
+ *
+ *          Function sends a control command to capture and display link to
+ *          to Start all the required links . Links are started in reverce
+ *          order as information of next link is required to connect.
+ *          System_linkStart is called with LinkId to start the links.
+ *
+ * \param   pObj  [IN] chains_vipSingleCam_SgxDisplayAppObj
+ *
+ *
+ *******************************************************************************
+*/
+Void chains_vipSingleCam_DisplayWbNull_StopApp(chains_vipSingleCam_SgxDisplayAppObj *pObj)
+{
+
+    chains_vipSingleCam_DisplayWbNull_Stop(&pObj->ucObj);
+
+    chains_vipSingleCam_DisplayWbNull_Delete(&pObj->ucObj);
+
+    ChainsCommon_StopDisplayCtrl();
+
+    ChainsCommon_prfLoadCalcEnable(FALSE, FALSE, FALSE);
+
+}
+
+/**
+ *******************************************************************************
+ *
+ * \brief   Single Channel Capture Display usecase function
+ *
+ *          This functions executes the create, start functions
+ *
+ *          Further in a while loop displays run time menu and waits
+ *          for user inputs to print the statistics or to end the demo.
+ *
+ *          Once the user inputs end of demo stop and delete
+ *          functions are executed.
+ *
+ * \param   chainsCfg       [IN]   Chains_Ctrl
+ *
+ *******************************************************************************
+*/
+Void chains_vipSingleCam_DisplayWbNull(Chains_Ctrl *chainsCfg)
+{
+    char ch;
+    UInt32 done = FALSE;
+    chains_vipSingleCam_DisplayWbNullAppObj chainsObj;
+
+    chainsObj.chainsCfg = chainsCfg;
+
+    chains_vipSingleCam_DisplayWbNull_Create(&chainsObj.ucObj, &chainsObj);
+
+    chains_vipSingleCam_DisplayWbNull_StartApp(&chainsObj);
+
+    while(!done)
+    {
+        ch = Chains_menuRunTime();
+
+        switch(ch)
+        {
+            case '0':
+                done = TRUE;
+                break;
+            case 'p':
+            case 'P':
+                ChainsCommon_prfCpuLoadPrint();
+                ChainsCommon_statCollectorPrint();
+                chains_vipSingleCam_DisplayWbNull_printStatistics(&chainsObj.ucObj);
+                chains_vipSingleCam_DisplayWbNull_printBufferStatistics(&chainsObj.ucObj);
+                break;
+            default:
+                Vps_printf("\nUnsupported option '%c'. Please try again\n", ch);
+                break;
+        }
+    }
+
+    chains_vipSingleCam_DisplayWbNull_StopApp(&chainsObj);
+
+}
