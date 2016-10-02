@@ -90,7 +90,7 @@ Void chains_vipSingleCam_DisplayWbNull_SetSgxDisplayLinkPrms (
  *******************************************************************************
 */
 
-Void chains_vipSingleCam_DisplayWbNull_SetAppPrms(chains_vipSingleCam_DisplayWbNullObj *pObj, Void *appObj)
+Void chains_vipSingleCam_DisplayWbNull_SetAppPrms(chains_vipSingleCam_DisplayWbNullObj *pUcObj, Void *appObj)
 {
     UInt32 displayWidth, displayHeight;
 
