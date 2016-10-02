@@ -100,7 +100,7 @@ Void chains_vipSingleCam_DisplayWbNull_SetAppPrms(chains_vipSingleCam_DisplayWbN
     pObj->captureOutWidth  = CAPTURE_SENSOR_WIDTH;
     pObj->captureOutHeight = CAPTURE_SENSOR_HEIGHT;
 
-    ChainsCommon_SingleCam_SetCapturePrms(&(pUcObj->CapturePrm),
+    ChainsCommon_SingleCam_SetCapturePrms(&(pUcObj->Capture_dsswbPrm),
             CAPTURE_SENSOR_WIDTH,
             CAPTURE_SENSOR_HEIGHT,
             pObj->captureOutWidth,
