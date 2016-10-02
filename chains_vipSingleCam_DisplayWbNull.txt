@@ -1,0 +1,9 @@
+UseCase: chains_vipSingleCam_DisplayWbNull
+
+Capture -> SgxFrmcpy (A15)
+SgxFrmcpy -> Display_M4 (IPU1_0)
+ 
+GrpxSrc -> Display_Grpx
+
+Capture_dsswb -> Null
+
