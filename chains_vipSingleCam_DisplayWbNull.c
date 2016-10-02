@@ -114,7 +114,7 @@ Void chains_vipSingleCam_DisplayWbNull_SetAppPrms(chains_vipSingleCam_DisplayWbN
         &displayHeight
         );
 
-    chains_vipSingleCam_SgxDisplay_SetSgxDisplayLinkPrms
+    chains_vipSingleCam_DisplayWbNull_SetSgxDisplayLinkPrms
                     (&pUcObj->SgxFrmcpyPrm,
                      displayWidth,
                      displayHeight
@@ -161,7 +161,7 @@ Void chains_vipSingleCam_DisplayWbNull_SetAppPrms(chains_vipSingleCam_DisplayWbN
  *
  *******************************************************************************
 */
-Void chains_vipSingleCam_DisplayWbNull_StartApp(chains_vipSingleCam_SgxDisplayAppObj *pObj)
+Void chains_vipSingleCam_DisplayWbNull_StartApp(chains_vipSingleCam_DisplayWbNullAppObj *pObj)
 {
     ChainsCommon_statCollectorReset();
     ChainsCommon_memPrintHeapStatus();
@@ -186,7 +186,7 @@ Void chains_vipSingleCam_DisplayWbNull_StartApp(chains_vipSingleCam_SgxDisplayAp
  *
  *******************************************************************************
 */
-Void chains_vipSingleCam_DisplayWbNull_StopApp(chains_vipSingleCam_SgxDisplayAppObj *pObj)
+Void chains_vipSingleCam_DisplayWbNull_StopApp(chains_vipSingleCam_DisplayWbNullAppObj *pObj)
 {
 
     chains_vipSingleCam_DisplayWbNull_Stop(&pObj->ucObj);
