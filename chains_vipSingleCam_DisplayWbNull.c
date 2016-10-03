@@ -23,6 +23,14 @@
 #define LCD_DISPLAY_WIDTH         (800)
 #define LCD_DISPLAY_HEIGHT        (480)
 
+/* Display writes two pixels extra for the interlaced modes, so
+   DSS write back should allocate memory for extra two pixels.
+   This macro is used for providing extra pixels to the display write back path
+   And also for configuring CRC modules ROI correctly. */
+#define DISPLAY_WB_EXTRA_PIXELS             (2U)
+
+static volatile UInt32 frameCount = 0;
+
 /**
  *******************************************************************************
  *
@@ -53,6 +61,18 @@ static struct control_srv_egl_ctx chainsEglParams = {
    .destroy_egl_native_buffer = gbm_allocator_destroy_native_buffer,
 };
 
+Int32 chains_vipSingleCam_DisplayWbNull_CbFxn(
+                         Void *appObj,
+                         System_Buffer *pBuffer)
+{
+    frameCount++;
+    if(frameCount%30 == 0){
+        Vps_printf("\nFrameCount '%i'\n", frameCount);
+    }
+
+    return SYSTEM_LINK_STATUS_SOK;
+}
+
 /**
  *******************************************************************************
  *
@@ -76,6 +96,47 @@ Void chains_vipSingleCam_DisplayWbNull_SetSgxDisplayLinkPrms (
     prms->bEglInfoInCreate = TRUE;
     prms->EglInfo = (void *)&chainsEglParams;
 }
+
+/**
+ *******************************************************************************
+ *
+ * \brief   Set link Parameters of the DSS WB capture
+ *
+ *******************************************************************************
+*/
+static void chains_vipSingleCam_DisplayWbNull_SetCaptureDssWbPrms(
+                                   CaptureLink_CreateParams *pPrm,
+                                   UInt32 displayWidth,
+                                   UInt32 displayHeight,
+                                   Chains_DisplayType displayType)
+{
+    pPrm->callback = chains_vipSingleCam_DisplayWbNull_CbFxn;
+    pPrm->numVipInst = 0;
+    pPrm->numDssWbInst = 1;
+    //pPrm->dssWbInst[0].dssWbInstId = VPS_CAPT_INST_DSS_WB1;
+    System_VideoScanFormat scanFormat = SYSTEM_SF_PROGRESSIVE;
+
+    pPrm->dssWbInst[0].dssWbInputPrms.inNode = SYSTEM_WB_IN_NODE_GFX;
+    /* Set this to SYSTEM_WB_IN_NODE_TV for TDA2xx platform
+       and to SYSTEM_WB_IN_NODE_LCD1 for TDA3xx platform */
+    pPrm->dssWbInst[0].dssWbInputPrms.wbInSourceWidth = displayWidth;
+    pPrm->dssWbInst[0].dssWbInputPrms.wbInSourceHeight = displayHeight;
+    pPrm->dssWbInst[0].dssWbInputPrms.wbInWidth = displayWidth;
+    pPrm->dssWbInst[0].dssWbInputPrms.wbInHeight = displayHeight;
+    pPrm->dssWbInst[0].dssWbInputPrms.wbPosx = 0;
+    pPrm->dssWbInst[0].dssWbInputPrms.wbPosy = 0;
+    pPrm->dssWbInst[0].dssWbInputPrms.wbInSourceDataFmt = SYSTEM_DF_BGR24_888;
+    pPrm->dssWbInst[0].dssWbInputPrms.wbScanFormat = scanFormat;
+
+    pPrm->dssWbInst[0].dssWbOutputPrms.wbWidth = displayWidth;
+    pPrm->dssWbInst[0].dssWbOutputPrms.wbHeight = displayHeight;
+    pPrm->dssWbInst[0].dssWbOutputPrms.wbDataFmt = SYSTEM_DF_BGR24_888;
+    pPrm->dssWbInst[0].dssWbOutputPrms.wbScanFormat = scanFormat;
+
+    pPrm->dssWbInst[0].numBufs = CAPTURE_LINK_NUM_BUFS_PER_CH_DEFAULT;
+}
+
+
 
 /**
  *******************************************************************************
@@ -137,6 +198,12 @@ Void chains_vipSingleCam_DisplayWbNull_SetAppPrms(chains_vipSingleCam_DisplayWbN
                                 displayWidth,
                                 displayHeight
                                );
+
+    chains_vipSingleCam_DisplayWbNull_SetCaptureDssWbPrms(
+                            &pUcObj->Capture_dsswbPrm,
+                            pObj->displayWidth,
+                            pObj->displayHeight,
+                            pObj->chainsCfg->displayType);
 
     ChainsCommon_StartDisplayCtrl(
         pObj->chainsCfg->displayType,
