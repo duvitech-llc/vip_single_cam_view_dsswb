@@ -201,8 +201,8 @@ Void chains_vipSingleCam_DisplayWbNull_SetAppPrms(chains_vipSingleCam_DisplayWbN
 
     chains_vipSingleCam_DisplayWbNull_SetCaptureDssWbPrms(
                             &pUcObj->Capture_dsswbPrm,
-                            pObj->displayWidth,
-                            pObj->displayHeight,
+                            displayWidth,
+                            displayHeight,
                             pObj->chainsCfg->displayType);
 
     ChainsCommon_StartDisplayCtrl(
