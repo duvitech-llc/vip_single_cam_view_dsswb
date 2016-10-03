@@ -113,10 +113,10 @@ static void chains_vipSingleCam_DisplayWbNull_SetCaptureDssWbPrms(
     pPrm->callback = chains_vipSingleCam_DisplayWbNull_CbFxn;
     pPrm->numVipInst = 0;
     pPrm->numDssWbInst = 1;
-    //pPrm->dssWbInst[0].dssWbInstId = VPS_CAPT_INST_DSS_WB1;
+    pPrm->dssWbInst[0].dssWbInstId = 0;
     System_VideoScanFormat scanFormat = SYSTEM_SF_PROGRESSIVE;
 
-    pPrm->dssWbInst[0].dssWbInputPrms.inNode = SYSTEM_WB_IN_NODE_GFX;
+    pPrm->dssWbInst[0].dssWbInputPrms.inNode = SYSTEM_WB_IN_NODE_TV;
     /* Set this to SYSTEM_WB_IN_NODE_TV for TDA2xx platform
        and to SYSTEM_WB_IN_NODE_LCD1 for TDA3xx platform */
     pPrm->dssWbInst[0].dssWbInputPrms.wbInSourceWidth = displayWidth;
@@ -175,6 +175,12 @@ Void chains_vipSingleCam_DisplayWbNull_SetAppPrms(chains_vipSingleCam_DisplayWbN
         &displayHeight
         );
 
+    chains_vipSingleCam_DisplayWbNull_SetCaptureDssWbPrms(
+                            &pUcObj->Capture_dsswbPrm,
+                            displayWidth,
+                            displayHeight,
+                            pObj->chainsCfg->displayType);
+
     chains_vipSingleCam_DisplayWbNull_SetSgxDisplayLinkPrms
                     (&pUcObj->SgxFrmcpyPrm,
                      displayWidth,
@@ -198,12 +204,6 @@ Void chains_vipSingleCam_DisplayWbNull_SetAppPrms(chains_vipSingleCam_DisplayWbN
                                 displayWidth,
                                 displayHeight
                                );
-
-    chains_vipSingleCam_DisplayWbNull_SetCaptureDssWbPrms(
-                            &pUcObj->Capture_dsswbPrm,
-                            displayWidth,
-                            displayHeight,
-                            pObj->chainsCfg->displayType);
 
     ChainsCommon_StartDisplayCtrl(
         pObj->chainsCfg->displayType,
